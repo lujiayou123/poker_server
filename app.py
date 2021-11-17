@@ -40,6 +40,20 @@ def query_mysql_data(data_id):
     print(result)
     return result
 
+def merge_txt(nickName):
+    folder_path = "./data/{}/".format(nickName)
+    output_folder_path = "./merged/{}/".format(nickName)
+    guarantee_path_exists(output_folder_path)
+    file_name = "merged.txt"
+    output_file_path = output_folder_path + file_name
+    result = open(output_file_path, 'w', encoding='utf-8')
+    files = getFileList(folder_path, ".txt")
+    file_num = len(files)
+    for i in range(file_num):
+        file = open(folder_path + files[i], 'r', encoding='utf-8')
+        lines = file.readlines()
+        result.writelines(lines)
+        result.write("\n")
 
 class DateEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -87,20 +101,12 @@ def generate_hand():
 
 @app.route('/download_hands/<nickName>', methods=["GET"])
 def download_hands(nickName):
-    folder_path = "./data/{}/".format(nickName)
-    output_folder_path = "./merged/{}/".format(nickName)
-    guarantee_path_exists(output_folder_path)
-    file_name = "merged.txt"
-    output_file_path = output_folder_path + file_name
-    result = open(output_file_path, 'w', encoding='utf-8')
-    files = getFileList(folder_path, ".txt")
-    file_num = len(files)
-    for i in range(file_num):
-        file = open(folder_path + files[i], 'r', encoding='utf-8')
-        lines = file.readlines()
-        result.writelines(lines)
-        result.write("\n")
-    return "xxx"
+    # 将nickName对应的所有txt合并
+    merge_txt(nickName)
+    data_dir = os.path.join(app.root_path, "merged")
+    data_dir = os.path.join(data_dir, nickName)
+    fname = f"merged.txt"
+    return send_from_directory(data_dir, fname, as_attachment=True)
 
 @app.route('/')
 def hello_world():
