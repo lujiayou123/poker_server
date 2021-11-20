@@ -1,4 +1,5 @@
-from flask import Flask, send_file, request, send_from_directory, make_response
+from flask import Flask, send_file, request, send_from_directory, make_response, jsonify,make_response
+from flask_cors import CORS
 import pymysql
 import json
 import datetime
@@ -7,6 +8,7 @@ from util import getFileList
 import os
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 
 def getTimeFromHandInfo(handInfo_string):
     datetime = handInfo_string.split("-")[1][1:].strip()
@@ -106,6 +108,7 @@ def download_hands(nickName):
     data_dir = os.path.join(app.root_path, "merged")
     data_dir = os.path.join(data_dir, nickName)
     fname = f"merged.txt"
+    print("merge hands of user {}".format(nickName))
     return send_from_directory(data_dir, fname, as_attachment=True)
 
 @app.route('/')
@@ -114,4 +117,5 @@ def hello_world():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=5000)
+    # app.run()
