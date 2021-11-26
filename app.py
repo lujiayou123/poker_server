@@ -111,6 +111,14 @@ def download_hands(nickName):
     print("merge hands of user {}".format(nickName))
     return send_from_directory(data_dir, fname, as_attachment=True)
 
+@app.route('/get_recorded_handsNum/<nickName>', methods=["GET"])
+def get_recorded_handsNum(nickName):
+    # 将nickName对应的所有txt合并
+    folder_path = "./data/{}/".format(nickName)
+    files = getFileList(folder_path, ".txt")
+    hands_num = len(files)
+    return str(hands_num)
+
 @app.route('/')
 def hello_world():
     return 'Hello World!'
